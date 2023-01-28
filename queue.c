@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include "queue.h"
 
-
 /* can be modified with semaphore */
 void queue_lock(QUEUE_T *q)
 {
