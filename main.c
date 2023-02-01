@@ -16,9 +16,10 @@ int main(void)
 
 	gettimeofday(&begin, 0);
 	//test_8bit();
-	//test_Nbit(2);
+	//test_Nbit(1);
+	test_NbitInverse(1);
 	gettimeofday(&end, 0);
-
+/*
 	queue_init(&q, buf, sizeof(buf), 4);
 
 	gettimeofday(&begin, 0);
@@ -40,6 +41,6 @@ int main(void)
     printf("Time measured GET: %ld us.\n", microseconds);
     printf("val = 0x%08X\n",val);
 
-
+*/
     return 0;
 }

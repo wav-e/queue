@@ -24,7 +24,7 @@ void print_queue_info(QUEUE_T *q)
 	int i=0; 
 	uint8_t *ptr = (uint8_t*)q->buf;
 
-	printf("\r\n\r\n----START MEMORY-------\r\n");
+	printf("----START MEMORY-------\r\n");
     for (i=0; i<((q->qSize)*(q->maxObjs)); i++)
     {
     	if (q->startPtr == &ptr[i])
@@ -152,6 +152,177 @@ void test_Nbit(uint8_t size_byte)
 	}
 	print_queue_info(&Queue);
 }
+
+
+void test_NbitInverse(uint8_t size_byte)
+{
+	int i=0;
+	uint32_t 	tmp;
+
+
+	uint8_t 	tmp8;
+	uint16_t 	tmp16;
+	uint32_t	tmp32;
+
+	#define TEST_OBJS_NUM_2 4
+
+	uint8_t bBuf[TEST_OBJS_NUM_2];
+	uint16_t wBuf[TEST_OBJS_NUM_2];
+	uint32_t dwBuf[TEST_OBJS_NUM_2];
+ 	void *buf;
+ 	
+	QUEUE_T Queue;
+
+
+
+	memset(bBuf,0xAA, sizeof(bBuf));
+	memset(wBuf,0xAA, sizeof(wBuf));
+	memset(dwBuf,0xAA, sizeof(dwBuf));
+
+
+	switch(size_byte)
+	{
+		case(1): buf = (void*)bBuf;  break;
+		case(2): buf = (void*)wBuf; break;
+		case(4): buf = (void*)dwBuf; break;
+		default: {
+			printf("QUEUE TEST: unsupporting size\r\n"); 
+			return;
+		}
+
+	}
+	queue_init(&Queue, buf, size_byte*TEST_OBJS_NUM_2, size_byte);
+
+
+
+	printf("init\r\n");
+	printf("num elements = %d\r\n", queue_get_num(&Queue));
+	print_queue_info(&Queue);
+
+	printf("---------------------------------\r\n");
+	printf("put 1 elements\r\n");
+	for (i=0; i<TEST_OBJS_NUM_2-1; i++)
+		queue_put(&Queue, &i);
+	printf("num elements = %d\r\n", queue_get_num(&Queue));
+	print_queue_info(&Queue);
+	printf("---------------------------------\r\n");
+
+	printf("\r\ntrying put to head\r\n");
+	queue_putToHead(&Queue, &i);
+	print_queue_info(&Queue);
+	printf("---------------------------------\r\n");
+
+	printf("\r\ntrying put to head overrun\r\n");
+	queue_putToHead(&Queue, &i);
+	print_queue_info(&Queue);
+	printf("---------------------------------\r\n");
+
+
+
+
+	printf("\r\ntrying to get 1 element\r\n");
+	tmp = 0;
+	printf("tmp init = 0x%X\r\n", tmp);	
+	queue_get(&Queue, &tmp);
+	printf("getval = 0x%X\r\n", tmp);	
+	print_queue_info(&Queue);
+	printf("num elements = %d\r\n", queue_get_num(&Queue));
+	printf("---------------------------------\r\n");
+
+
+	printf("\r\ntrying to get 1 element\r\n");
+	tmp = 0;
+	printf("tmp init = 0x%X\r\n", tmp);	
+	queue_get(&Queue, &tmp);
+	printf("getval = 0x%X\r\n", tmp);	
+	print_queue_info(&Queue);
+	printf("num elements = %d\r\n", queue_get_num(&Queue));
+	printf("---------------------------------\r\n");
+
+
+	printf("\r\ntrying put to head\r\n");
+	tmp = 0xDC;
+	queue_putToHead(&Queue, &tmp);
+	print_queue_info(&Queue);
+	printf("---------------------------------\r\n");	
+
+	tmp = 0xDD;
+	printf("\r\ntrying put to head\r\n");
+	queue_putToHead(&Queue, &tmp);
+	print_queue_info(&Queue);
+	printf("num elements = %d\r\n", queue_get_num(&Queue));
+	printf("---------------------------------\r\n");	
+
+	
+	{
+	uint32_t tmp[TEST_OBJS_NUM_2];
+	memset(&tmp, 0x0, sizeof(tmp));
+	printf("\r\ntrying to get all elements\r\n");
+	for (i=0; i<TEST_OBJS_NUM_2; i++)
+	{	
+		queue_get(&Queue, &tmp[i]);
+		printf ("tmp[%d]=0x%X\r\n", i, tmp[i]);
+	}
+	print_queue_info(&Queue);
+	printf("num elements = %d\r\n", queue_get_num(&Queue));
+	printf("---------------------------------\r\n");
+
+	}
+#if 0
+
+	printf ("trying overrun put. ret=%d\r\n", queue_put(&Queue, &i));
+	print_queue_info(&Queue);
+
+
+	printf("---------------------------------\r\n");
+	printf("get 5 elements:\r\n");
+	for (int i=0; i<TEST_OBJS_NUM_2/2; i++)
+	{ 	
+		queue_get(&Queue, &tmp);
+		printf("getval = %d\r\n", tmp);
+	}
+	print_queue_info(&Queue);
+
+	printf ("get 5 elements again\r\n");
+	printf("---------------------------------\r\n");
+	printf("get 5 elements:\r\n");
+	for (int i=0; i<TEST_OBJS_NUM_2/2; i++)
+	{ 	
+
+		queue_get(&Queue, &tmp);
+		printf("getval = %d\r\n", tmp);
+	}
+	print_queue_info(&Queue);
+
+
+	printf("---------------------------------\r\n");
+
+	printf ("tmp=%d\r\n",  tmp);
+	printf ("get 1 element overrun. ret=%d\r\n", queue_get(&Queue, &tmp));
+	printf ("tmp=%d\r\n",  tmp);
+
+	printf("---------------------------------\r\n");
+	printf("get 5 elements:\r\n");
+	for (int i=0; i<TEST_OBJS_NUM_2/2; i++)
+	{ 	
+		queue_get(&Queue, &tmp);
+		printf("getval = %d\r\n", tmp);
+	}
+	print_queue_info(&Queue);
+
+	#endif
+}
+
+
+
+
+
+
+
+
+
+
+
 
 void test_Nbit_check(uint8_t size_byte)
 {

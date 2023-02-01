@@ -37,6 +37,7 @@ QUEUE_ERROR queue_put(QUEUE_T *q, void *obj)
 
 	queue_lock(q);
 
+
 #if QUEUE_OPTIMISE	
 	if(1 == q->qSize)
 	{
@@ -68,7 +69,63 @@ QUEUE_ERROR queue_put(QUEUE_T *q, void *obj)
 	return QUEUE_OK;
 }
 
+/**
+ * @brief   Put object to head queue.
+ * @param   q pointer to queue struct.
+ * @param   obj Pointer to object you want put, It can be *uint8_t, *uint16_t, 
+ *          *uint32_t, or any size struct pointer, but it must match with 
+ * 			objSize that was set when queue init.
+ * 
+ * @note	if queue is not full you can put object in head (like stack)
+ *
+ * @retval  Error if not 0.
+ */
+QUEUE_ERROR queue_putToHead(QUEUE_T *q, void *obj)
+{
+    if (!q->isInit)
+        return QUEUE_INIT_ERR;
 
+    if (q->numObjs == q->maxObjs)
+        return QUEUE_NO_MEM_ERR;
+
+	while(q->isLocked)
+	{;}
+
+	queue_lock(q);
+
+	/* shift getPtr back and write data into *(getPtr) */
+    q->getPtr = (q->getPtr==q->startPtr)? (q->endPtr) : (q->getPtr-q->qSize);
+
+#if QUEUE_OPTIMISE	
+	if(1 == q->qSize)
+	{
+		*((uint8_t*)(q->getPtr)) = *((uint8_t*)(obj));
+	}
+	else if (2 == q->qSize)
+	{
+		*((uint16_t*)(q->getPtr))=*((uint16_t*)(obj));
+	}
+	else if (4 == q->qSize)
+	{
+		*((uint32_t*)(q->getPtr))=*((uint32_t*)(obj));
+	}
+	else
+	{
+		memcpy(q->getPtr, obj, q->qSize);
+	}
+#else
+		memcpy(q->getPtr, obj, q->qSize);
+#endif
+
+	q->numObjs++;
+	
+	/* put ptr is not shifting */
+	//q->putPtr = (q->endPtr==q->putPtr)? (q->startPtr) : (q->putPtr+q->qSize);
+
+	queue_unlock(q);  
+
+	return QUEUE_OK;
+}
 
 /**
  * @brief   Get object from queue.
@@ -111,6 +168,10 @@ QUEUE_ERROR queue_get(QUEUE_T *q, void *obj)
 	}
 #else
     memcpy(obj, q->getPtr, q->qSize);
+#endif
+
+#if QUEUE_DEBUG
+    memset(q->getPtr, 0xAA , q->qSize);
 #endif
 
     q->getPtr = (q->getPtr==q->endPtr)? (q->startPtr) : (q->getPtr+q->qSize);
@@ -165,6 +226,7 @@ QUEUE_ERROR queue_init(QUEUE_T *q, void *buf, uint32_t buf_size_bytes, uint32_t 
 	q->numObjs = 0;
 	q->maxObjs = buf_size_bytes/objSize;
 
+	//todo need to fix
 	q->endPtr = ((uint8_t*)buf) + (buf_size_bytes-objSize);
 
 	if(buf_size_bytes%objSize)
