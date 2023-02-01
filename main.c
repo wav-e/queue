@@ -16,8 +16,8 @@ int main(void)
 
 	gettimeofday(&begin, 0);
 	//test_8bit();
-	//test_Nbit(1);
-	test_NbitInverse(1);
+	test_Nbit(2);
+	//test_NbitInverse(1);
 	gettimeofday(&end, 0);
 /*
 	queue_init(&q, buf, sizeof(buf), 4);

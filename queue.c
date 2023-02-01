@@ -213,10 +213,12 @@ QUEUE_ERROR queue_init(QUEUE_T *q, void *buf, uint32_t buf_size_bytes, uint32_t 
 		return QUEUE_NULL_ERR;
 
 	if (objSize > buf_size_bytes)
-		return QUEUE_NO_MEM_ERR;
+		return QUEUE_INIT_WRONG_SIZE_ERR;
+
+	if(buf_size_bytes%objSize)
+		printf("buf size not equal to objects\r\n");
 
 	q->qSize = objSize;
-	q->buf = buf;
 
 	q->getPtr = buf;
 	q->putPtr = buf;
@@ -226,11 +228,9 @@ QUEUE_ERROR queue_init(QUEUE_T *q, void *buf, uint32_t buf_size_bytes, uint32_t 
 	q->numObjs = 0;
 	q->maxObjs = buf_size_bytes/objSize;
 
-	//todo need to fix
-	q->endPtr = ((uint8_t*)buf) + (buf_size_bytes-objSize);
+	q->endPtr = ((uint8_t*)buf) + ((q->maxObjs-1)*(objSize));
 
-	if(buf_size_bytes%objSize)
-		printf("buf size not equal to objects\r\n");
+
 	
 	q->isInit = 1;
 	q->isLocked = 0;

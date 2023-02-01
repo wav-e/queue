@@ -51,13 +51,9 @@
 
 /**
  * @brief   queue instance
- * 
- * @todo buf is needed?
  */
 typedef struct
 {
-    void        *buf;       /// pointer to static memory buf
-
 	void 		*startPtr;  /// start buffer pointer
 	void 		*endPtr;    /// last element pointer
 
@@ -80,6 +76,7 @@ typedef enum
 	QUEUE_NO_MEM_ERR,
 	QUEUE_NULL_ERR,
 	QUEUE_INIT_ERR,
+    QUEUE_INIT_WRONG_SIZE_ERR,
 	QUEUE_EMPTY_ERR
 }QUEUE_ERROR;
 
@@ -123,13 +120,13 @@ QUEUE_ERROR queue_get(QUEUE_T *q, void *obj);
 
 /**
  * @brief   Init queue.
+ * 
  * @param   q pointer to queue struct
  * @param   buf pointer to queue buffer
  * @param   buf_size_bytes size of buf
  * @param   objSize size of one object in queue in bytes
- * @retval  Error if not 0.
  * 
- * @todo align end pointer 
+ * @retval  Error if not 0.
  */
 QUEUE_ERROR queue_init(QUEUE_T *q, void *buf, uint32_t buf_size_bytes, uint32_t objSize);
 

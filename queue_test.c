@@ -4,7 +4,7 @@
 #include "queue.h"
 
 
-print_mem(uint8_t *mem, uint32_t size)
+void print_mem(uint8_t *mem, uint32_t size)
 {
     for (int i=0; i<size; i++){
         printf("mem[%d] = 0x%02X\r\n", i, mem[i]);
@@ -22,7 +22,7 @@ print_mem(uint8_t *mem, uint32_t size)
 void print_queue_info(QUEUE_T *q)
 {
 	int i=0; 
-	uint8_t *ptr = (uint8_t*)q->buf;
+	uint8_t *ptr = (uint8_t*)q->startPtr;
 
 	printf("----START MEMORY-------\r\n");
     for (i=0; i<((q->qSize)*(q->maxObjs)); i++)
